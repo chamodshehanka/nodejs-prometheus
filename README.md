@@ -79,3 +79,12 @@ jobs:
       - name: GitHub Image Push
         run: docker push $SERVICE_NAME:latest
 ```
+
+Then I can see my image in the [GitHub Container Registry](https://github.com/Shehanka/nodejs-prometheus/pkgs/container/node-app).
+
+and I can even pull that image to my local machine using below command.
+
+```shell
+docker pull ghcr.io/shehanka/node-app:latest
+``` 
+
