@@ -41,3 +41,41 @@ To publish a Docker image to GitHub Container I need to have a personal access t
 
 Then go to repsitory settings and add that token as a secret (Secret name is `GHCR_TOKEN`). If you don't know about GitHub secrets please go through [this](https://docs.github.com/en/actions/security-guides/encrypted-secrets) guide.
 
+Then add below file content to `.github/workflows/docker-publish.yml` file.
+```yaml
+name: GitHub Registry Image Push
+on:
+  push:
+    branches:
+      - main
+      
+jobs:
+  build:
+    runs-on:
+      - ubuntu-latest
+    env:
+      SERVICE_NAME: ghcr.io/chamodshehanka/node-app
+      CONTAINER_REGISTRY: ghcr.io
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set Version
+        id: event-version
+        run: echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+            path: /tmp/.buildx-cache
+            key: ${{ runner.os }}-buildx-${{ github.sha }}
+            restore-keys: |
+              ${{ runner.os }}-buildx-
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ env.CONTAINER_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+      - name: Build the Docker image
+        run: docker build --tag ${SERVICE_NAME}:latest --file Dockerfile .
+      - name: GitHub Image Push
+        run: docker push $SERVICE_NAME:latest
+```
