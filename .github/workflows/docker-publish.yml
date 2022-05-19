@@ -5,11 +5,11 @@ on:
       - main
       
 jobs:
-  build:
+  build-push:
     runs-on:
       - ubuntu-latest
     env:
-      SERVICE_NAME: ghcr.io/chamodshehanka/node-app
+      SERVICE_NAME: ghcr.io/shehanka/node-app
       CONTAINER_REGISTRY: ghcr.io
     steps:
       - uses: actions/checkout@v2
